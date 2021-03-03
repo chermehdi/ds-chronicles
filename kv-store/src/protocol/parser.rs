@@ -3,9 +3,20 @@ use crate::protocol::{Command, Response};
 use crate::Result;
 use std::io::Cursor;
 
+/// Parser is a struct holder for protocol parsing methods.
 pub struct Parser {}
 
 impl Parser {
+    /// Parse the given buffer into a `Command` instance.
+    ///
+    /// If the cursor contains data that does not adhere to the defined protocol, the function will
+    /// return a `Result::Err`.
+    ///     
+    /// The contents of the cursor are not altered.  
+    ///
+    /// If the function was able to parse a prefix into a command, the cursor's pointer is advanced
+    /// to the end of that prefix, yet failing in the middle of parsing the cursor can leave the
+    /// internal pointer in any random location.
     pub fn parse(data: &mut Cursor<&[u8]>) -> Result<Command> {
         let _header = crate::protocol::get_u8(data)?;
         let command = get_u32(data)?;
@@ -17,6 +28,16 @@ impl Parser {
         }
     }
 
+    /// Parse the given buffer into a `Response` instance.
+    ///
+    /// If the cursor contains data that does not adhere to the defined protocol, the function will
+    /// return a `Result::Err`.
+    ///     
+    /// The contents of the cursor are not altered.  
+    ///
+    /// If the function was able to parse a prefix into a `Response`, the cursor's pointer is advanced
+    /// to the end of that prefix, yet failing in the middle of parsing the cursor can leave the
+    /// internal pointer in any random location.
     pub fn parse_response(data: &mut Cursor<&[u8]>) -> Result<Response> {
         let _header = get_u8(data)?;
         let response_type = get_u8(data)?;
