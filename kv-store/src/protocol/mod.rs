@@ -31,9 +31,11 @@ fn get_u8(cur: &mut Cursor<&[u8]>) -> Result<u8> {
 }
 
 fn get_u32(cur: &mut Cursor<&[u8]>) -> Result<u32> {
-    use atoi::atoi;
     let line = get_slice(cur, 4)?;
-    atoi::<u32>(line).ok_or_else(|| "Could not convert line into usize".into())
+    Ok(((line[0] as u32) << 24)
+        + ((line[1] as u32) << 16)
+        + ((line[2] as u32) << 8)
+        + ((line[3] as u32) << 0))
 }
 
 fn get_string(cur: &mut Cursor<&[u8]>) -> Result<String> {
@@ -46,7 +48,7 @@ fn get_string(cur: &mut Cursor<&[u8]>) -> Result<String> {
 fn get_slice<'a>(cur: &mut Cursor<&'a [u8]>, len: usize) -> Result<&'a [u8]> {
     let from = cur.position() as usize;
     let until = from + len;
-    if cur.get_ref().len() > until {
+    if cur.get_ref().len() < until {
         return Err("Buffer exhaused before being able to read the required data".into());
     }
     cur.set_position(until as u64);
