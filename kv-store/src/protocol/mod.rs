@@ -15,6 +15,7 @@ pub enum Command {
     Set(String, String),
     Get(String),
     Clear(String),
+    Ping(String),
 }
 
 #[derive(Debug)]

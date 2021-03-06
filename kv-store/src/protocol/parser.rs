@@ -24,6 +24,7 @@ impl Parser {
             0 => Parser::parse_get(data),
             1 => Parser::parse_set(data),
             2 => Parser::parse_clear(data),
+            3 => Parser::parse_ping(data),
             _ => Err("Unknown command number".into()),
         }
     }
@@ -64,6 +65,11 @@ impl Parser {
     fn parse_clear(data: &mut Cursor<&[u8]>) -> Result<Command> {
         let key = get_string(data)?;
         Ok(Command::Clear(key))
+    }
+
+    fn parse_ping(data: &mut Cursor<&[u8]>) -> Result<Command> {
+        let key = get_string(data)?;
+        Ok(Command::Ping(key))
     }
 }
 
