@@ -1,6 +1,6 @@
 use crate::protocol::Command;
 use crate::protocol::Response;
-use std::io::{Cursor, Result};
+use std::io::Result;
 use tokio::io::{AsyncWriteExt, BufWriter};
 use tokio::net::TcpStream;
 
@@ -29,6 +29,16 @@ impl Writer {
                 buf.write_u8(0).await?;
                 buf.write_u16(2).await?;
                 write_string(buf, &key).await?;
+            }
+            Command::Ping(key) => {
+                buf.write_u8(0).await?;
+                buf.write_u16(3).await?;
+                if key.is_empty() {
+                    // Default to `PONG`
+                    write_string(buf, &"PONG".into()).await?;
+                } else {
+                    write_string(buf, &key).await?;
+                }
             }
         }
         Ok(())
