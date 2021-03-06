@@ -6,6 +6,8 @@ pub type Result<T> = std::result::Result<T, Err>;
 mod handler;
 mod protocol;
 
+mod client;
+
 async fn process(stream: TcpStream) -> Result<()> {
     let mut handler = handler::ConnectionHandler::new(stream);
     loop {
