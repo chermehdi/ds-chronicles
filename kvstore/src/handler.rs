@@ -71,18 +71,8 @@ impl ConnectionHandler {
 
     async fn ensure_filled(&mut self) -> Result<Option<usize>> {
         // TODO: clean this up. Use a proper enum to indicate the state of the buffer.
-        println!("Trying to fill the buffer {:}", self.buf.len());
         if self.buf.is_empty() {
-            let read = match self.stream.read_buf(&mut self.buf).await {
-                Ok(read) => {
-                    println!("Something happened {:?}", read);
-                    read
-                }
-                Err(msg) => {
-                    println!("Something happened {:?}", msg);
-                    0
-                }
-            };
+            let read = self.stream.read_buf(&mut self.buf).await?;
             if read == 0 {
                 // Connection is closed from the client
                 return Ok(None);
@@ -92,6 +82,10 @@ impl ConnectionHandler {
         Ok(Some(0))
     }
 
+    /// Execute the command.
+    ///
+    /// This makes any changes necessary to the storage, and writes back responses to the
+    /// this handler's `buf`.
     pub async fn execute(&mut self, cmd: Command) -> Result<()> {
         match cmd {
             Command::Ping(key) => {
