@@ -24,7 +24,7 @@ impl ConnectionHandler {
         ConnectionHandler {
             stream: BufWriter::new(stream),
             // size of the buffer is kind of arbitrary here.
-            buf: BytesMut::with_capacity(1 << 16),
+            buf: BytesMut::with_capacity(1 << 10),
         }
     }
 
@@ -82,6 +82,10 @@ impl ConnectionHandler {
         Ok(Some(0))
     }
 
+    /// Execute the command.
+    ///
+    /// This makes any changes necessary to the storage, and writes back responses to the
+    /// this handler's `buf`.
     pub async fn execute(&mut self, cmd: Command) -> Result<()> {
         match cmd {
             Command::Ping(key) => {

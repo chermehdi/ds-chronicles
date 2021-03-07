@@ -1,15 +1,8 @@
+use crate::{ConnectionHandler, Result};
 use tokio::net::{TcpListener, TcpStream};
 
-pub type Err = Box<dyn std::error::Error + Send + Sync>;
-pub type Result<T> = std::result::Result<T, Err>;
-
-mod handler;
-mod protocol;
-
-mod client;
-
 async fn process(stream: TcpStream) -> Result<()> {
-    let mut handler = handler::ConnectionHandler::new(stream);
+    let mut handler = ConnectionHandler::new(stream);
     loop {
         match handler.read_command().await {
             Ok(val) => match val {
@@ -21,6 +14,7 @@ async fn process(stream: TcpStream) -> Result<()> {
                 }
             },
             Err(msg) => {
+                println!("matched an error {:?}", msg);
                 return Err(msg);
             }
         }
@@ -28,17 +22,12 @@ async fn process(stream: TcpStream) -> Result<()> {
     Ok(())
 }
 
-#[tokio::main]
-async fn main() {
-    let port = "6556";
-    let listener = TcpListener::bind(format!("0.0.0.0:{}", port))
-        .await
-        .unwrap();
+pub async fn run(listener: TcpListener) {
     loop {
         let (stream, _) = listener.accept().await.unwrap();
         tokio::spawn(async move {
-            if let Err(_msg) = process(stream).await {
-                // log the error message
+            if let Err(msg) = process(stream).await {
+                println!("An error happened while processing the request: {:?}", msg);
             }
         });
     }
