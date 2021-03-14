@@ -14,7 +14,6 @@ async fn process(stream: TcpStream) -> Result<()> {
                 }
             },
             Err(msg) => {
-                println!("matched an error {:?}", msg);
                 return Err(msg);
             }
         }
