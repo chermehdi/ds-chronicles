@@ -13,6 +13,57 @@ async fn test_ping() {
 }
 
 #[tokio::test]
+async fn test_set_get() {
+    let addr = start_server().await.unwrap();
+    let mut client = kvstore::client::create(addr).await.unwrap();
+    let res = client
+        .set(String::from("key"), String::from("value"))
+        .await
+        .unwrap();
+    assert_eq!(res, Some(Response::Ok(String::from("key"))));
+
+    let res = client.get(String::from("key")).await.unwrap();
+    assert_eq!(res, Some(Response::Ok(String::from("value"))));
+}
+
+#[tokio::test]
+async fn test_set_override() {
+    let addr = start_server().await.unwrap();
+    let mut client = kvstore::client::create(addr).await.unwrap();
+    let res = client
+        .set(String::from("key"), String::from("value1"))
+        .await
+        .unwrap();
+    assert_eq!(res, Some(Response::Ok(String::from("key"))));
+    let res = client
+        .set(String::from("key"), String::from("value2"))
+        .await
+        .unwrap();
+    assert_eq!(res, Some(Response::Ok(String::from("key"))));
+
+    let res = client.get(String::from("key")).await.unwrap();
+    assert_eq!(res, Some(Response::Ok(String::from("value2"))));
+}
+
+#[tokio::test]
+async fn test_unset() {
+    let addr = start_server().await.unwrap();
+    let mut client = kvstore::client::create(addr).await.unwrap();
+    let res = client
+        .set(String::from("key"), String::from("value"))
+        .await
+        .unwrap();
+    assert_eq!(res, Some(Response::Ok(String::from("key"))));
+
+    let res = client.unset(String::from("key")).await.unwrap();
+    assert_eq!(res, Some(Response::Ok(String::from("value"))));
+
+    // clients shouldn't be able to see the value after it's been deleted
+    let res = client.get(String::from("key")).await.unwrap();
+    assert_eq!(res, Some(Response::Error(String::from("Key not found"))));
+}
+
+#[tokio::test]
 async fn test_ping_with_value() {
     let addr = start_server().await.unwrap();
     let mut client = kvstore::client::create(addr).await.unwrap();

@@ -27,6 +27,12 @@ impl Client {
         return self.handler.read_response().await;
     }
 
+    pub async fn unset(&mut self, key: String) -> Result<Option<Response>> {
+        let command = Command::Clear(key);
+        self.handler.write_command(&command).await?;
+        return self.handler.read_response().await;
+    }
+
     pub async fn ping(&mut self, key: String) -> Result<Option<Response>> {
         let command = Command::Ping(key);
         self.handler.write_command(&command).await?;
