@@ -4,7 +4,6 @@ use tokio::net::{TcpStream, ToSocketAddrs};
 use crate::protocol::{Command, Response};
 use crate::Result;
 
-#[derive(Debug)]
 pub struct Client {
     handler: ConnectionHandler,
 }
