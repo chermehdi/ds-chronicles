@@ -99,7 +99,7 @@ impl Executor {
                 // Either there was an error trying to parse a command from the input stream,
                 // Or the client closed the socket. eitherway we won't be processing further
                 // requests for simplicity.
-                return Err("Connection closed / Poisened message".into());
+                return Err("Connection closed / Poisoned message".into());
             }
         }
     }
