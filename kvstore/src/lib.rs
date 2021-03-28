@@ -12,4 +12,9 @@ pub use client::{create, Client};
 
 pub mod server;
 
+pub mod storage;
+pub use storage::{Storage, StorageOptions};
+
+mod executor;
+
 pub const DEFAULT_PORT: &str = "6555";

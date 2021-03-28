@@ -4,7 +4,6 @@ use tokio::net::{TcpStream, ToSocketAddrs};
 use crate::protocol::{Command, Response};
 use crate::Result;
 
-#[derive(Debug)]
 pub struct Client {
     handler: ConnectionHandler,
 }
@@ -24,6 +23,12 @@ impl Client {
 
     pub async fn get(&mut self, key: String) -> Result<Option<Response>> {
         let command = Command::Get(key);
+        self.handler.write_command(&command).await?;
+        return self.handler.read_response().await;
+    }
+
+    pub async fn unset(&mut self, key: String) -> Result<Option<Response>> {
+        let command = Command::Clear(key);
         self.handler.write_command(&command).await?;
         return self.handler.read_response().await;
     }

@@ -10,7 +10,6 @@ use crate::Result;
 ///
 /// There is a 1:1 relationship between the client and a handler, it is used to hide the
 /// networking logic from other components.
-#[derive(Debug)]
 pub struct ConnectionHandler {
     // created per client connection, used to read/write commands and responses.
     stream: BufWriter<TcpStream>,
@@ -80,30 +79,5 @@ impl ConnectionHandler {
             return Ok(Some(read));
         }
         Ok(Some(0))
-    }
-
-    /// Execute the command.
-    ///
-    /// This makes any changes necessary to the storage, and writes back responses to the
-    /// this handler's `buf`.
-    pub async fn execute(&mut self, cmd: Command) -> Result<()> {
-        match cmd {
-            Command::Ping(key) => {
-                return self.handle_ping(key).await;
-            }
-            _ => {
-                unimplemented!();
-            }
-        }
-    }
-
-    async fn handle_ping(&mut self, key: String) -> Result<()> {
-        if key.is_empty() {
-            // Default to a ping.
-            self.write_response(&Response::Ok("PONG".into())).await?;
-        } else {
-            self.write_response(&Response::Ok(key)).await?;
-        }
-        Ok(())
     }
 }
